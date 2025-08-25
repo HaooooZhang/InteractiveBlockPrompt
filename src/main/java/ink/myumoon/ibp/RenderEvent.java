@@ -3,27 +3,29 @@ package ink.myumoon.ibp;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@EventBusSubscriber(modid = "ibp")
+@Mod.EventBusSubscriber(modid = "ibp")
 public class RenderEvent {
 
     private static final int ICON_SIZE = 12;
     private static final int ICON_OFFSET = 10;
 
-    private static final ResourceLocation INTERACTIVE_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/interactive_icon.png");
+    private static final ResourceLocation INTERACTIVE_ICON = ResourceLocation.fromNamespaceAndPath(InteractiveBlockPrompt.MODID,"textures/gui/interactive_icon.png");
     private static final TagKey<Block> INTERACTIVE_TAG = create("interactive");
+
     private static TagKey<Block> create(String create){
-        return  BlockTags.create(ResourceLocation.fromNamespaceAndPath(InteractiveBlockPrompt.MODID, create));
+        return BlockTags.create(ResourceLocation.fromNamespaceAndPath(InteractiveBlockPrompt.MODID, create));
     }
 
     @SubscribeEvent
@@ -39,6 +41,7 @@ public class RenderEvent {
         BlockPos blockPos = blockHitResult.getBlockPos();
 
         if (minecraft.level != null && minecraft.level.getBlockState(blockPos).is(INTERACTIVE_TAG)) {
+        //if (minecraft.level.getBlockState(blockPos).getBlock() == Blocks.GOLD_BLOCK){
             int screenWidth = event.getGuiGraphics().guiWidth();
             int screenHeight = event.getGuiGraphics().guiHeight();
 
@@ -49,8 +52,7 @@ public class RenderEvent {
         }
     }
 
-    //图标渲染
-    private static void drawIcon(GuiGraphics guiGraphics,int x, int y){
+    private static void drawIcon(GuiGraphics guiGraphics, int x, int y){
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1,1,1,0.8F);
 
@@ -61,7 +63,6 @@ public class RenderEvent {
                 ICON_SIZE,ICON_SIZE,
                 ICON_SIZE,ICON_SIZE
         );
-
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1,1,1,1);
     }
