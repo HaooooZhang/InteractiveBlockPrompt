@@ -3,17 +3,24 @@ package ink.myumoon.ibp;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
+
+import javax.annotation.Nullable;
 
 @EventBusSubscriber(modid = "ibp")
 public class RenderEvent {
@@ -31,22 +38,30 @@ public class RenderEvent {
     public static void onInteractiveBlock(RenderGuiEvent.Pre event){
         Minecraft minecraft = Minecraft.getInstance();
 
-        //方块识别
-        if (minecraft.hitResult == null || minecraft.hitResult.getType() != HitResult.Type.BLOCK){
-            return;
-        }
+        Options options = minecraft.options;
 
-        BlockHitResult blockHitResult = (BlockHitResult) minecraft.hitResult;
-        BlockPos blockPos = blockHitResult.getBlockPos();
+        boolean isFirstPerson = options.getCameraType().isFirstPerson();
+        boolean isNotSpectator = minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR;
+        boolean canRenderForSpectator = canRenderCrosshairForSpectator(minecraft.hitResult);
 
-        if (minecraft.level != null && minecraft.level.getBlockState(blockPos).is(INTERACTIVE_TAG)) {
-            int screenWidth = event.getGuiGraphics().guiWidth();
-            int screenHeight = event.getGuiGraphics().guiHeight();
+        if (isFirstPerson && (isNotSpectator || canRenderForSpectator)){
+            //方块识别
+            if (minecraft.hitResult == null || minecraft.hitResult.getType() != HitResult.Type.BLOCK){
+                return;
+            }
 
-            int x = screenWidth / 2 + ICON_OFFSET;
-            int y = screenHeight / 2 - ICON_SIZE / 2;
+            BlockHitResult blockHitResult = (BlockHitResult) minecraft.hitResult;
+            BlockPos blockPos = blockHitResult.getBlockPos();
 
-            drawIcon(event.getGuiGraphics(), x, y);
+            if (minecraft.level != null && minecraft.level.getBlockState(blockPos).is(INTERACTIVE_TAG)) {
+                int screenWidth = event.getGuiGraphics().guiWidth();
+                int screenHeight = event.getGuiGraphics().guiHeight();
+
+                int x = screenWidth / 2 + ICON_OFFSET;
+                int y = screenHeight / 2 - ICON_SIZE / 2;
+
+                drawIcon(event.getGuiGraphics(), x, y);
+            }
         }
     }
 
@@ -67,8 +82,25 @@ public class RenderEvent {
                 ICON_SIZE,ICON_SIZE
         );
 
-        // 恢复默认混合模式
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
+    }
+
+    //from Gui#canRenderCrosshairForSpectator
+    private static boolean canRenderCrosshairForSpectator(@Nullable HitResult rayTrace) {
+        if (rayTrace == null) {
+            return false;
+        } else if (rayTrace.getType() == HitResult.Type.ENTITY) {
+            return ((EntityHitResult)rayTrace).getEntity() instanceof MenuProvider;
+        } else if (rayTrace.getType() == HitResult.Type.BLOCK) {
+            BlockPos blockpos = ((BlockHitResult)rayTrace).getBlockPos();
+            Level level = Minecraft.getInstance().level;
+            if (level != null) {
+                return level.getBlockState(blockpos).getMenuProvider(level, blockpos) != null;
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 }
