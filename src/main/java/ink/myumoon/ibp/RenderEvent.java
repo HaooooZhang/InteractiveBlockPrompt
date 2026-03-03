@@ -26,10 +26,28 @@ import javax.annotation.Nullable;
 public class RenderEvent {
 
     private static final int ICON_SIZE = 12;
-    private static final int ICON_OFFSET = 10;
+    private static final int ICON_OFFSET = 8;
 
-    private static final ResourceLocation INTERACTIVE_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/interactive_icon.png");
-    private static final TagKey<Block> INTERACTIVE_TAG = create("interactive");
+    // Tag keys for different block types
+    private static final TagKey<Block> BOOK_TAG = create("book");
+    private static final TagKey<Block> BUTTON_TAG = create("button");
+    private static final TagKey<Block> CLICK_TAG = create("click");
+    private static final TagKey<Block> INTEREST_TAG = create("interest");
+    private static final TagKey<Block> NOTICE_TAG = create("notice");
+    private static final TagKey<Block> SEARCH_TAG = create("search");
+    private static final TagKey<Block> TOGGLE_TAG = create("toggle");
+    private static final TagKey<Block> WRENCH_TAG = create("wrench");
+
+    // Icon resource locations
+    private static final ResourceLocation BOOK_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/book.png");
+    private static final ResourceLocation BUTTON_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/button.png");
+    private static final ResourceLocation CLICK_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/click.png");
+    private static final ResourceLocation INTEREST_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/interest.png");
+    private static final ResourceLocation NOTICE_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/notice.png");
+    private static final ResourceLocation SEARCH_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/search.png");
+    private static final ResourceLocation TOGGLE_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/toggle.png");
+    private static final ResourceLocation WRENCH_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/wrench.png");
+
     private static TagKey<Block> create(String create){
         return  BlockTags.create(ResourceLocation.fromNamespaceAndPath(InteractiveBlockPrompt.MODID, create));
     }
@@ -53,19 +71,35 @@ public class RenderEvent {
             BlockHitResult blockHitResult = (BlockHitResult) minecraft.hitResult;
             BlockPos blockPos = blockHitResult.getBlockPos();
 
-            if (minecraft.level != null && minecraft.level.getBlockState(blockPos).is(INTERACTIVE_TAG)) {
+            if (minecraft.level != null) {
                 int screenWidth = event.getGuiGraphics().guiWidth();
                 int screenHeight = event.getGuiGraphics().guiHeight();
 
                 int x = screenWidth / 2 + ICON_OFFSET;
                 int y = screenHeight / 2 - ICON_SIZE / 2;
 
-                drawIcon(event.getGuiGraphics(), x, y);
+                if (minecraft.level.getBlockState(blockPos).is(BOOK_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, BOOK_ICON);
+                } else if (minecraft.level.getBlockState(blockPos).is(BUTTON_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, BUTTON_ICON);
+                } else if (minecraft.level.getBlockState(blockPos).is(CLICK_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, CLICK_ICON);
+                } else if (minecraft.level.getBlockState(blockPos).is(INTEREST_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, INTEREST_ICON);
+                } else if (minecraft.level.getBlockState(blockPos).is(NOTICE_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, NOTICE_ICON);
+                } else if (minecraft.level.getBlockState(blockPos).is(SEARCH_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, SEARCH_ICON);
+                } else if (minecraft.level.getBlockState(blockPos).is(TOGGLE_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, TOGGLE_ICON);
+                } else if (minecraft.level.getBlockState(blockPos).is(WRENCH_TAG)) {
+                    drawIcon(event.getGuiGraphics(), x, y, WRENCH_ICON);
+                }
             }
         }
     }
 
-    private static void drawIcon(GuiGraphics guiGraphics,int x, int y){
+    private static void drawIcon(GuiGraphics guiGraphics, int x, int y, ResourceLocation icon){
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
                 GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR,
@@ -75,7 +109,7 @@ public class RenderEvent {
         );
 
         guiGraphics.blit(
-                INTERACTIVE_ICON,
+                icon,
                 x,y,
                 0,0,
                 ICON_SIZE,ICON_SIZE,
