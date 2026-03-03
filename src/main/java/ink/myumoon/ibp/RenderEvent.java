@@ -28,7 +28,6 @@ public class RenderEvent {
     private static final int ICON_SIZE = 12;
     private static final int ICON_OFFSET = 8;
 
-    // Tag keys for different block types
     private static final TagKey<Block> BOOK_TAG = create("book");
     private static final TagKey<Block> BUTTON_TAG = create("button");
     private static final TagKey<Block> CLICK_TAG = create("click");
@@ -38,7 +37,6 @@ public class RenderEvent {
     private static final TagKey<Block> TOGGLE_TAG = create("toggle");
     private static final TagKey<Block> WRENCH_TAG = create("wrench");
 
-    // Icon resource locations
     private static final ResourceLocation BOOK_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/book.png");
     private static final ResourceLocation BUTTON_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/button.png");
     private static final ResourceLocation CLICK_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/click.png");
