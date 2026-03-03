@@ -1,5 +1,6 @@
 package ink.myumoon.ibp;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -49,10 +50,14 @@ public class RenderEvent {
         }
     }
 
-    //图标渲染
     private static void drawIcon(GuiGraphics guiGraphics,int x, int y){
         RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1,1,1,0.8F);
+        RenderSystem.blendFuncSeparate(
+                GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR,
+                GlStateManager.SourceFactor.ONE,
+                GlStateManager.DestFactor.ZERO
+        );
 
         guiGraphics.blit(
                 INTERACTIVE_ICON,
@@ -62,7 +67,8 @@ public class RenderEvent {
                 ICON_SIZE,ICON_SIZE
         );
 
+        // 恢复默认混合模式
+        RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
-        RenderSystem.setShaderColor(1,1,1,1);
     }
 }
