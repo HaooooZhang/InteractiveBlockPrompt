@@ -52,15 +52,16 @@ public class RenderEvent {
 
     @SubscribeEvent
     public static void onInteractiveBlock(RenderGuiEvent.Pre event){
-        Minecraft minecraft = Minecraft.getInstance();
 
+        Minecraft minecraft = Minecraft.getInstance();
         Options options = minecraft.options;
 
         boolean isFirstPerson = options.getCameraType().isFirstPerson();
         boolean isNotSpectator = minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR;
         boolean canRenderForSpectator = canRenderCrosshairForSpectator(minecraft.hitResult);
+        boolean isHideGui = options.hideGui;
 
-        if (isFirstPerson && (isNotSpectator || canRenderForSpectator)){
+        if (isFirstPerson && (isNotSpectator || canRenderForSpectator) && !isHideGui) {
             //方块识别
             if (minecraft.hitResult == null || minecraft.hitResult.getType() != HitResult.Type.BLOCK){
                 return;
