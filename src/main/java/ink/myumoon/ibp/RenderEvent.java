@@ -57,7 +57,7 @@ public class RenderEvent {
         Options options = minecraft.options;
 
         boolean isFirstPerson = options.getCameraType().isFirstPerson();
-        boolean isNotSpectator = minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR;
+        boolean isNotSpectator = minecraft.gameMode != null && minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR;
         boolean canRenderForSpectator = canRenderCrosshairForSpectator(minecraft.hitResult);
 
         if (isFirstPerson && (isNotSpectator || canRenderForSpectator)){
@@ -73,8 +73,9 @@ public class RenderEvent {
                 int screenWidth = event.getGuiGraphics().guiWidth();
                 int screenHeight = event.getGuiGraphics().guiHeight();
 
-                int x = screenWidth / 2 + ICON_OFFSET;
-                int y = screenHeight / 2 - ICON_SIZE / 2;
+                int[] iconPosition = getIconPosition(screenWidth, screenHeight, Config.getIconDirection());
+                int x = iconPosition[0];
+                int y = iconPosition[1];
 
                 if (minecraft.level.getBlockState(blockPos).is(BOOK_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, BOOK_ICON);
@@ -95,6 +96,18 @@ public class RenderEvent {
                 }
             }
         }
+    }
+
+    private static int[] getIconPosition(int screenWidth, int screenHeight, IconDirection direction) {
+        int centerX = screenWidth / 2;
+        int centerY = screenHeight / 2;
+
+        return switch (direction) {
+            case UP -> new int[] {centerX - ICON_SIZE / 2, centerY - ICON_OFFSET - ICON_SIZE};
+            case DOWN -> new int[] {centerX - ICON_SIZE / 2, centerY + ICON_OFFSET};
+            case LEFT -> new int[] {centerX - ICON_OFFSET - ICON_SIZE, centerY - ICON_SIZE / 2};
+            case RIGHT -> new int[] {centerX + ICON_OFFSET, centerY - ICON_SIZE / 2};
+        };
     }
 
     private static void drawIcon(GuiGraphics guiGraphics, int x, int y, ResourceLocation icon){
