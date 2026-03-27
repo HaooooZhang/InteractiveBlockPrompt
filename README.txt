@@ -44,3 +44,49 @@ Community Documentation: https://docs.minecraftforge.net/en/1.20.1/gettingstarte
 LexManos' Install Video: https://youtu.be/8VEdtQLuLO0
 Forge Forums: https://forums.minecraftforge.net/
 Forge Discord: https://discord.minecraftforge.net/
+
+Indicator JSON Config
+=========================
+This mod supports per-indicator JSON files under your config directory.
+
+Default path:
+- `config/ibp/indicators/book.json`
+- `config/ibp/indicators/button.json`
+- `config/ibp/indicators/click.json`
+- `config/ibp/indicators/interest.json`
+- `config/ibp/indicators/notice.json`
+- `config/ibp/indicators/search.json`
+- `config/ibp/indicators/toggle.json`
+- `config/ibp/indicators/wrench.json`
+
+When these files are missing, empty templates are created automatically.
+
+`ibp-common.toml` options:
+- `indicatorRules.enableJsonRules` (default `true`)
+- `indicatorRules.jsonDirectory` (default `ibp/indicators`)
+
+JSON format (`rules` can also be the root array):
+
+{
+  "rules": [
+    {
+      "block": "minecraft:barrel"
+    },
+    {
+      "block_tag": "minecraft:signs"
+    },
+    {
+      "block": "minecraft:chest",
+      "nbt": "{CustomName:'\"Shop\"'}"
+    }
+  ]
+}
+
+Rule fields:
+- `block`: exact block id.
+- `block_tag`: block tag id.
+- `nbt`: block entity NBT SNBT string.
+
+Matching behavior:
+- JSON rules are checked first for each indicator.
+- If no JSON rule matches, existing `data/ibp/tags/blocks/*.json` behavior still works.

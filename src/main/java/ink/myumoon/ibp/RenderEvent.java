@@ -13,6 +13,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -70,6 +71,7 @@ public class RenderEvent {
             BlockPos blockPos = blockHitResult.getBlockPos();
 
             if (minecraft.level != null) {
+                BlockState blockState = minecraft.level.getBlockState(blockPos);
                 int screenWidth = event.getGuiGraphics().guiWidth();
                 int screenHeight = event.getGuiGraphics().guiHeight();
 
@@ -77,21 +79,21 @@ public class RenderEvent {
                 int x = iconPosition[0];
                 int y = iconPosition[1];
 
-                if (minecraft.level.getBlockState(blockPos).is(BOOK_TAG)) {
+                if (IndicatorTargetManager.matches("book", blockState) || blockState.is(BOOK_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, BOOK_ICON);
-                } else if (minecraft.level.getBlockState(blockPos).is(BUTTON_TAG)) {
+                } else if (IndicatorTargetManager.matches("button", blockState) || blockState.is(BUTTON_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, BUTTON_ICON);
-                } else if (minecraft.level.getBlockState(blockPos).is(CLICK_TAG)) {
+                } else if (IndicatorTargetManager.matches("click", blockState) || blockState.is(CLICK_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, CLICK_ICON);
-                } else if (minecraft.level.getBlockState(blockPos).is(INTEREST_TAG)) {
+                } else if (IndicatorTargetManager.matches("interest", blockState) || blockState.is(INTEREST_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, INTEREST_ICON);
-                } else if (minecraft.level.getBlockState(blockPos).is(NOTICE_TAG)) {
+                } else if (IndicatorTargetManager.matches("notice", blockState) || blockState.is(NOTICE_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, NOTICE_ICON);
-                } else if (minecraft.level.getBlockState(blockPos).is(SEARCH_TAG)) {
+                } else if (IndicatorTargetManager.matches("search", blockState) || blockState.is(SEARCH_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, SEARCH_ICON);
-                } else if (minecraft.level.getBlockState(blockPos).is(TOGGLE_TAG)) {
+                } else if (IndicatorTargetManager.matches("toggle", blockState) || blockState.is(TOGGLE_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, TOGGLE_ICON);
-                } else if (minecraft.level.getBlockState(blockPos).is(WRENCH_TAG)) {
+                } else if (IndicatorTargetManager.matches("wrench", blockState) || blockState.is(WRENCH_TAG)) {
                     drawIcon(event.getGuiGraphics(), x, y, WRENCH_ICON);
                 }
             }

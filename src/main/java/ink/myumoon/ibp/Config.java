@@ -8,6 +8,8 @@ public class Config {
 
 	public static final ForgeConfigSpec SPEC;
 	private static final ForgeConfigSpec.EnumValue<IconDirection> ICON_DIRECTION;
+	private static final ForgeConfigSpec.BooleanValue ENABLE_JSON_INDICATOR_RULES;
+	private static final ForgeConfigSpec.ConfigValue<String> JSON_INDICATOR_DIRECTORY;
 
 	static {
 		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -18,6 +20,15 @@ public class Config {
 				.defineEnum("iconDirection", IconDirection.RIGHT);
 		builder.pop();
 
+		builder.push("indicatorRules");
+		ENABLE_JSON_INDICATOR_RULES = builder
+				.comment("Enable indicator matching rules loaded from JSON files in the config directory")
+				.define("enableJsonRules", true);
+		JSON_INDICATOR_DIRECTORY = builder
+				.comment("Directory under config/ where per-indicator json files are stored")
+				.define("jsonDirectory", "ibp/indicators");
+		builder.pop();
+
 		SPEC = builder.build();
 	}
 
@@ -25,4 +36,14 @@ public class Config {
 		return ICON_DIRECTION.get();
 	}
 
+	public static boolean isJsonIndicatorRulesEnabled() {
+		return ENABLE_JSON_INDICATOR_RULES.get();
+	}
+
+	public static String getJsonIndicatorDirectory() {
+		return JSON_INDICATOR_DIRECTORY.get();
+	}
+
 }
+
+
