@@ -7,7 +7,7 @@ import com.google.gson.JsonParser;
 import com.mojang.logging.LogUtils;
 import ink.myumoon.ibp.InteractiveBlockPrompt;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -29,7 +29,6 @@ import java.util.*;
 
 @EventBusSubscriber(modid = InteractiveBlockPrompt.MODID)
 public class IndicatorTargetManager {
-
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final List<String> INDICATOR_KEYS = List.of(
             "book", "button", "click", "interest", "notice", "search", "toggle", "wrench"
@@ -152,7 +151,7 @@ public class IndicatorTargetManager {
 
     @Nullable
     private static TargetRule parseRule(Path file, JsonObject object) {
-        ResourceLocation blockId = parseBlockId(file, object);
+        Identifier blockId = parseBlockId(file, object);
         TagKey<Block> blockTag = parseBlockTag(file, object);
 
         if (blockId == null && blockTag == null) {
@@ -164,13 +163,13 @@ public class IndicatorTargetManager {
     }
 
     @Nullable
-    private static ResourceLocation parseBlockId(Path file, JsonObject object) {
+    private static Identifier parseBlockId(Path file, JsonObject object) {
         JsonElement raw = object.get("block");
         if (raw == null || !raw.isJsonPrimitive()) {
             return null;
         }
 
-        ResourceLocation id = ResourceLocation.tryParse(raw.getAsString());
+        Identifier id = Identifier.tryParse(raw.getAsString());
         if (id == null || !BuiltInRegistries.BLOCK.containsKey(id)) {
             LOGGER.warn("Ignoring unknown block id {} in {}", raw.getAsString(), file);
             return null;
@@ -186,7 +185,7 @@ public class IndicatorTargetManager {
             return null;
         }
 
-        ResourceLocation id = ResourceLocation.tryParse(raw.getAsString());
+        Identifier id = Identifier.tryParse(raw.getAsString());
         if (id == null) {
             LOGGER.warn("Ignoring invalid block_tag {} in {}", raw.getAsString(), file);
             return null;
@@ -195,7 +194,7 @@ public class IndicatorTargetManager {
         return BlockTags.create(id);
     }
 
-    private record TargetRule(ResourceLocation blockId, TagKey<Block> blockTag) {
+    private record TargetRule(Identifier blockId, TagKey<Block> blockTag) {
 
         private boolean matches(BlockState blockState){
             if (blockId != null && !blockId.equals(BuiltInRegistries.BLOCK.getKey(blockState.getBlock()))) {

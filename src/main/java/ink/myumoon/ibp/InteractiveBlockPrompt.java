@@ -1,14 +1,14 @@
 package ink.myumoon.ibp;
 
 import ink.myumoon.ibp.config.ConfigCommon;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.ModContainer;
 
 @Mod(InteractiveBlockPrompt.MODID)
 public class InteractiveBlockPrompt {

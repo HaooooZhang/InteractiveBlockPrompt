@@ -1,15 +1,15 @@
 package ink.myumoon.ibp;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import ink.myumoon.ibp.config.ConfigCommon;
 import ink.myumoon.ibp.config.IconDirection;
 import ink.myumoon.ibp.config.IndicatorTargetManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.MenuProvider;
@@ -26,11 +26,13 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
 import javax.annotation.Nullable;
 
-@EventBusSubscriber(modid = "ibp")
+@EventBusSubscriber(modid = InteractiveBlockPrompt.MODID)
 public class RenderEvent {
 
     private static final int ICON_SIZE = 12;
     private static final int ICON_OFFSET = 8;
+    // Matches vanilla crosshair invert blend: ONE_MINUS_DST_COLOR / ONE_MINUS_SRC_COLOR.
+    private static final RenderPipeline ICON_INVERT_PIPELINE = RenderPipelines.CROSSHAIR;
 
     private static final TagKey<Block> BOOK_TAG = create("book");
     private static final TagKey<Block> BUTTON_TAG = create("button");
@@ -41,22 +43,21 @@ public class RenderEvent {
     private static final TagKey<Block> TOGGLE_TAG = create("toggle");
     private static final TagKey<Block> WRENCH_TAG = create("wrench");
 
-    private static final ResourceLocation BOOK_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/book.png");
-    private static final ResourceLocation BUTTON_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/button.png");
-    private static final ResourceLocation CLICK_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/click.png");
-    private static final ResourceLocation INTEREST_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/interest.png");
-    private static final ResourceLocation NOTICE_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/notice.png");
-    private static final ResourceLocation SEARCH_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/search.png");
-    private static final ResourceLocation TOGGLE_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/toggle.png");
-    private static final ResourceLocation WRENCH_ICON = ResourceLocation.fromNamespaceAndPath("ibp","textures/gui/wrench.png");
+    private static final Identifier BOOK_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/book.png");
+    private static final Identifier BUTTON_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/button.png");
+    private static final Identifier CLICK_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/click.png");
+    private static final Identifier INTEREST_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/interest.png");
+    private static final Identifier NOTICE_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/notice.png");
+    private static final Identifier SEARCH_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/search.png");
+    private static final Identifier TOGGLE_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/toggle.png");
+    private static final Identifier WRENCH_ICON = Identifier.fromNamespaceAndPath("ibp","textures/gui/wrench.png");
 
     private static TagKey<Block> create(String create){
-        return  BlockTags.create(ResourceLocation.fromNamespaceAndPath(InteractiveBlockPrompt.MODID, create));
+        return BlockTags.create(Identifier.fromNamespaceAndPath(InteractiveBlockPrompt.MODID, create));
     }
 
     @SubscribeEvent
-    public static void onInteractiveBlock(RenderGuiEvent.Pre event){
-
+    public static void onInteractiveBlock(RenderGuiEvent.Pre event) {
         Minecraft minecraft = Minecraft.getInstance();
         Options options = minecraft.options;
 
@@ -65,9 +66,10 @@ public class RenderEvent {
         boolean canRenderForSpectator = canRenderCrosshairForSpectator(minecraft.hitResult);
         boolean isHideGui = options.hideGui;
 
+
         if (isFirstPerson && (isNotSpectator || canRenderForSpectator) && !isHideGui) {
             //方块识别
-            if (minecraft.hitResult == null || minecraft.hitResult.getType() != HitResult.Type.BLOCK){
+            if (minecraft.hitResult == null || minecraft.hitResult.getType() != HitResult.Type.BLOCK) {
                 return;
             }
 
@@ -116,25 +118,15 @@ public class RenderEvent {
         };
     }
 
-    private static void drawIcon(GuiGraphics guiGraphics, int x, int y, ResourceLocation icon){
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(
-                GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR,
-                GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR,
-                GlStateManager.SourceFactor.ONE,
-                GlStateManager.DestFactor.ZERO
-        );
-
+    private static void drawIcon(GuiGraphicsExtractor guiGraphics, int x, int y, Identifier icon){
         guiGraphics.blit(
+                ICON_INVERT_PIPELINE,
                 icon,
                 x,y,
                 0,0,
                 ICON_SIZE,ICON_SIZE,
                 ICON_SIZE,ICON_SIZE
         );
-
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableBlend();
     }
 
     //from Gui#canRenderCrosshairForSpectator
